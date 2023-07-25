@@ -2,8 +2,8 @@ import Config
 
 # Configure your database
 config :chat, Chat.Repo,
-  username: "sting",
-  password: "sting",
+  username: "postgres",
+  password: "postgres",
   hostname: "localhost",
   database: "chat_dev",
   stacktrace: true,
