@@ -1,0 +1,22 @@
+<div class="mx-auto max-w-sm">
+  <div class="bg-white p-8 rounded shadow-md w-full sm:max-w-md">
+    <.header class="text-center">Confirm Account</.header>
+
+    <.simple_form for={@form} id="confirmation_form" phx-submit="confirm_account">
+      <.input field={@form[:token]} type="hidden" />
+      <:actions>
+        <.button phx-disable-with="Confirming..." class="w-full">Confirm my account</.button>
+      </:actions>
+    </.simple_form>
+
+    <div class="mt-5 text-sm text-gray-600">
+      <p class="text-center text-sm mt-4 ">
+        <.link href={~p"/users/register"} class=" text-blue-500 hover:text-blue-700">
+          Register
+        </.link>
+        |
+        <.link href={~p"/users/log_in"} class=" text-blue-500 hover:text-blue-700">Log in</.link>
+      </p>
+    </div>
+  </div>
+</div>

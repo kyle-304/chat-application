@@ -1,0 +1,61 @@
+<div class="mx-auto max-w-sm">
+  <div class="bg-white p-8 rounded shadow-md w-full sm:max-w-md">
+    <.header class="text-2xl font-semibold mb-6">
+      Register
+    </.header>
+
+    <.simple_form
+      for={@form}
+      id="registration_form"
+      phx-submit="save"
+      phx-change="validate"
+      phx-trigger-action={@trigger_submit}
+      action={~p"/users/log_in?_action=registered"}
+      method="post"
+    >
+      <.error :if={@check_errors}>
+        Oops, something went wrong! Please check the errors below.
+      </.error>
+
+      <.input
+        field={@form[:email]}
+        type="email"
+        label="Email:"
+        placeholder="Enter your email address"
+      />
+
+      <.input
+        field={@form[:phone_number]}
+        type="text"
+        label="Phone number:"
+        placeholder="Enter your phone number"
+      />
+
+      <.input
+        field={@form[:password]}
+        type="password"
+        label="Password:"
+        placeholder="Enter your password"
+      />
+
+      <.input
+        field={@form[:password_confirmation]}
+        type="password"
+        label="Password confirmation:"
+        placeholder="Retype your password"
+      />
+
+      <:actions>
+        <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>
+      </:actions>
+    </.simple_form>
+
+    <div class="mt-5 text-sm text-gray-600">
+      Already registered?
+      <.link navigate={~p"/users/log_in"} class="font-semibold text-blue-500 hover:text-blue-700">
+        Sign in
+      </.link>
+      to your account now.
+    </div>
+  </div>
+</div>

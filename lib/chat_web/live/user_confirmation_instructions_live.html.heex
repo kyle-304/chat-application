@@ -1,0 +1,27 @@
+<div class="mx-auto max-w-sm">
+  <div class="bg-white p-4 rounded shadow-md w-full sm:max-w-md">
+    <.header class="text-center">
+      No confirmation instructions received?
+      <:subtitle>We'll send a new confirmation link to your inbox</:subtitle>
+    </.header>
+
+    <.simple_form for={@form} id="resend_confirmation_form" phx-submit="send_instructions">
+      <.input field={@form[:email]} type="email" placeholder="re-enter Email" required />
+      <:actions>
+        <.button phx-disable-with="Sending..." class="w-full">
+          Resend confirmation instructions
+        </.button>
+      </:actions>
+    </.simple_form>
+
+    <div class="mt-5 text-sm text-gray-600">
+      <p class="text-center text-sm mt-4">
+        <.link href={~p"/users/register"} class=" text-blue-500 hover:text-blue-700">
+          Register
+        </.link>
+        |
+        <.link href={~p"/users/log_in"} class=" text-blue-500 hover:text-blue-700">Log in</.link>
+      </p>
+    </div>
+  </div>
+</div>

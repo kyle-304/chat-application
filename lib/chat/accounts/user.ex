@@ -9,6 +9,7 @@ defmodule Chat.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
+
     timestamps()
   end
 
