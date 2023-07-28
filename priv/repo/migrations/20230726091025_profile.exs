@@ -11,10 +11,9 @@ defmodule Chat.Repo.Migrations.Profile do
       add :user_id, references(:users, type: :binary_id, on_delete: :delete_all)
 
       timestamps()
-
     end
-    create unique_index(:profiles,[:phone_number])
-    create unique_index(:profiles,[:user_id])
 
+    create unique_index(:profiles, [:phone_number])
+    create unique_index(:profiles, [:user_id])
   end
 end
