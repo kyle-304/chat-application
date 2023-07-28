@@ -10,6 +10,8 @@ defmodule Chat.Accounts.Profile do
     field :phone_number, :string
     field :profile_image, :string
     belongs_to :user, Chat.Accounts.User
+
+    timestamps()
   end
 
   def profile_changeset(profile, attrs) do

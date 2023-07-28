@@ -1,6 +1,7 @@
 defmodule Chat.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
@@ -8,7 +9,8 @@ defmodule Chat.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
-
+    has_one :profile, Chat.Accounts.Profile
+    many_to_many :chats, Chat.Accounts.Chat, join_through: Chat.Accounts.Chatuser
 
     timestamps()
   end
