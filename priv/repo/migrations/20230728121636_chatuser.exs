@@ -8,6 +8,8 @@ defmodule Chat.Repo.Migrations.Chatuser do
       add :chat_id, references(:chats, type: :binary_id)
     end
 
-    create unique_index(:chatusers, [:user_id, :chat_id])
+    create index(:chatusers, [:user_id])
+    create index(:chatusers, [:chat_id])
+    create unique_index(:chatusers, [:user_id, :chat_id], name: "chat_user_unique_index")
   end
 end
