@@ -19,8 +19,8 @@ defmodule Chat.Core.ContactList.Query do
   Returns a query representing the contact list for a user identified
   by the provided id
   """
-  @spec from_user(query :: queryable(), user_id :: String.t()) :: queryable()
-  def from_user(query \\ base(), user_id) do
+  @spec from_user_id(query :: queryable(), user_id :: String.t()) :: queryable()
+  def from_user_id(query \\ base(), user_id) do
     where(query, [c], c.user_id == ^user_id)
   end
 end

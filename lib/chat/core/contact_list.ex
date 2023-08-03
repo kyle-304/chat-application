@@ -57,10 +57,46 @@ defmodule Chat.Core.ContactList do
   defp validate_new_contact_not_existing(
          %{changes: %{contact_user_id: user_id}, data: data} = changeset
        ) do
-    if user_id in data.list, do: add_user_in_contact_error(changeset), else: changeset
+    in_list? = user_id in data.list
+    if in_list?, do: add_user_in_contact_error(changeset), else: add_to_list(changeset)
   end
 
   defp add_user_in_contact_error(changeset) do
     add_error(changeset, :contact_user_id, "user already in your contact")
+  end
+
+  defp add_to_list(%{changes: %{contact_user_id: user_id}, data: data} = changeset) do
+    put_change(changeset, :list, [user_id | data.list])
+  end
+
+  @doc """
+  Changeset for removing a contact from the contact list
+  """
+  @spec remove_contact_changeset(contact_list :: Changeset.t() | t(), attrs :: map()) ::
+          Changeset.t()
+  def remove_contact_changeset(contact_list, attrs) do
+    contact_list
+    |> cast(attrs, [:contact_user_id])
+    |> validate_required([:contact_user_id], message: "user contact is required")
+    |> validate_new_contact_exists()
+  end
+
+  defp validate_new_contact_exists(%{valid?: false} = changeset) do
+    changeset
+  end
+
+  defp validate_new_contact_exists(
+         %{changes: %{contact_user_id: user_id}, data: data} = changeset
+       ) do
+    in_list? = user_id in data.list
+    if in_list?, do: remove_from_list(changeset), else: add_user_not_existing_error(changeset)
+  end
+
+  defp remove_from_list(%{changes: %{contact_user_id: user_id}, data: data} = changeset) do
+    put_change(changeset, :list, List.delete(data.list, user_id))
+  end
+
+  defp add_user_not_existing_error(changeset) do
+    add_error(changeset, :current_user_id, "user not in your contact list")
   end
 end

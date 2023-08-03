@@ -16,14 +16,17 @@
         <span :if={@live_action == :index}>
           <.link
             patch={~p"/contacts/all"}
-            class="text-xs font-semibold text-blue-700 hover:underline"
+            class="bg-indigo-500 py-2.5 px-3 rounded-md text-xs font-semibold text-white hover:bg-indigo-600"
           >
-            All Users
+            Add new contacts
           </.link>
         </span>
 
         <span :if={@live_action == :all_contacts}>
-          <.link patch={~p"/contacts"} class="text-xs font-semibold text-blue-700 hover:underline">
+          <.link
+            patch={~p"/contacts"}
+            class="bg-indigo-500 py-2.5 px-3 rounded-md text-xs font-semibold text-white hover:bg-indigo-600"
+          >
             View my contacts
           </.link>
         </span>
@@ -37,7 +40,7 @@
           <tr>
             <th
               scope="col"
-              class="relative isolate py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
+              class="relative isolate py-3.5 pr-3 text-left text-xs font-bold text-gray-900"
             >
               First name
               <div class="absolute inset-y-0 right-full -z-10 w-screen border-b border-b-gray-200">
@@ -47,20 +50,20 @@
             </th>
             <th
               scope="col"
-              class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell"
+              class="hidden px-3 py-3.5 text-left text-xs font-bold text-gray-900 sm:table-cell"
             >
               Last name
             </th>
             <th
               scope="col"
-              class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 md:table-cell"
+              class="hidden px-3 py-3.5 text-left text-xs font-bold text-gray-900 md:table-cell"
             >
               Phone number
             </th>
 
             <th
               scope="col"
-              class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 md:table-cell"
+              class="hidden px-3 py-3.5 text-left text-xs font-bold text-gray-900 md:table-cell"
             >
               Email address
             </th>
@@ -80,14 +83,49 @@
             <td class="hidden px-3 py-4 text-xs font-medium text-gray-700 sm:table-cell">
               <%= contact.last_name %>
             </td>
-            <td class="hidden px-3 py-4 text-xs text-gray-700 md:table-cell">
+            <td class="hidden px-3 py-4 text-xs text-gray-700 font-medium md:table-cell">
               <%= contact.phone_number %>
             </td>
             <td class="px-3 py-4 text-xs text-gray-700 font-medium">paul@gmail.com</td>
-            <td class="relative py-4 pl-3 text-right text-xs font-medium">
-              <a href="#" class="text-indigo-600 hover:text-indigo-900">
-                Add as contact<span class="sr-only">, <%= contact.first_name %> </span>
-              </a>
+            <td
+              :if={@live_action == :all_contacts}
+              class="relative py-4 pl-3 text-right text-xs font-medium"
+            >
+              <button
+                phx-click="add_to_contacts"
+                phx-value-user_id={contact.user_id}
+                class="text-indigo-600 text-xs font-semibold hover:text-indigo-900 hover:underline disabled:text-green-700 disabled:hover:no-underline"
+                disabled={add_button_disabled?(@contact_ids, contact.user_id)}
+              >
+                <%= display_message(@contact_ids, contact.user_id) %>
+                <span class="sr-only">, <%= contact.first_name %></span>
+              </button>
+            </td>
+
+            <td
+              :if={@live_action == :index}
+              class="relative py-4 pl-3 text-right text-xs font-medium"
+            >
+              <button
+                phx-click="start_chat"
+                phx-value-user_id={contact.user_id}
+                class="text-indigo-600 hover:text-indigo-900"
+              >
+                Start chat<span class="sr-only">, <%= contact.first_name %> </span>
+              </button>
+            </td>
+
+            <td
+              :if={@live_action == :index}
+              class="relative py-4 pl-3 text-right text-xs font-medium"
+            >
+              <button
+                phx-click="remove_contact"
+                phx-value-user_id={contact.user_id}
+                class="text-indigo-600 hover:text-indigo-900"
+              >
+                Remove contact<span class="sr-only">, <%= contact.first_name %> </span>
+              </button>
             </td>
           </tr>
           <!-- More people... -->

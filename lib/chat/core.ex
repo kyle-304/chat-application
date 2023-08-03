@@ -34,7 +34,7 @@ defmodule Chat.Core do
   end
 
   defp contact_list_for_user(%{id: user_id}) do
-    query = ContactList.Query.from_user(user_id)
+    query = ContactList.Query.from_user_id(user_id)
     Chat.Repo.one!(query)
   end
 
@@ -59,5 +59,48 @@ defmodule Chat.Core do
   defp search_by_phone(phone_number) when is_binary(phone_number) do
     query = Profile.Query.phone_similar_to(phone_number)
     Chat.Repo.all(query)
+  end
+
+  @doc """
+  Adds a given user to the contact list of another user
+  """
+  @spec add_to_user_contacts_list(user :: User.t(), user_id :: String.t()) ::
+          {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def add_to_user_contacts_list(user, user_id) do
+    with contact_list <- contact_list_from_user!(user),
+         {:ok, _updated} <- add_to_contact_list(contact_list, user_id) do
+      {:ok, user}
+    end
+  end
+
+  defp add_to_contact_list(contact_list, user_id) do
+    changeset = ContactList.add_contact_changeset(contact_list, %{contact_user_id: user_id})
+    Chat.Repo.update(changeset)
+  end
+
+  @doc """
+  Returns the contact list for a user given the user
+  """
+  @spec contact_list_from_user!(user :: User.t()) :: ContactList.t()
+  def contact_list_from_user!(%{id: user_id}) do
+    query = ContactList.Query.from_user_id(user_id)
+    Chat.Repo.one!(query)
+  end
+
+  @doc """
+  Removes a given user from a user's contact list
+  """
+  @spec remove_from_user_contacts(user :: User.t(), user_id :: String.t()) ::
+          {:ok, User.t()} | {:error, Ecto.Changeset.t()}
+  def remove_from_user_contacts(user, user_id) do
+    with contact_list <- contact_list_from_user!(user),
+         {:ok, _contacts} <- remove_from_contact_list(contact_list, user_id) do
+      {:ok, user}
+    end
+  end
+
+  defp remove_from_contact_list(contact_list, user_id) do
+    changeset = ContactList.remove_contact_changeset(contact_list, %{contact_user_id: user_id})
+    Chat.Repo.update(changeset)
   end
 end

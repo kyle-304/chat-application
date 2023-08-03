@@ -18,7 +18,7 @@ defmodule Chat.Accounts.Profile do
           inserted_at: NaiveDateTime.t() | nil
         }
 
-  @fields [:first_name, :last_name, :phone_number]
+  @fields [:first_name, :last_name, :phone_number, :user_id]
 
   @foreign_key_type :binary_id
   @primary_key {:id, :binary_id, autogenerate: true}
