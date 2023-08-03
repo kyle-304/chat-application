@@ -4,9 +4,19 @@ defmodule Chat.Accounts do
   """
 
   import Ecto.Query, warn: false
-  alias Chat.Repo
 
-  alias Chat.Accounts.{User, UserToken, UserNotifier}
+  alias Chat.Core
+  alias Chat.Repo
+  alias Chat.Accounts.{User, UserToken, UserNotifier, Profile}
+
+  @doc """
+  Creates a new profile for a user
+  """
+  @spec create_profile(attrs :: map()) :: {:ok, Profile.t()} | {:error, Ecto.Changeset.t()}
+  def create_profile(profile \\ %Profile{}, attrs) do
+    changeset = Profile.creation_changeset(profile, attrs)
+    Chat.Repo.insert(changeset)
+  end
 
   ## Database getters
 
@@ -75,9 +85,19 @@ defmodule Chat.Accounts do
 
   """
   def register_user(attrs) do
-    %User{}
-    |> User.registration_changeset(attrs)
-    |> Repo.insert()
+    with {:ok, user} <- create_new_user(attrs),
+         {:ok, _contacts} <- new_contacts_list(user) do
+      {:ok, user}
+    end
+  end
+
+  defp create_new_user(user \\ %User{}, attrs) do
+    changeset = User.registration_changeset(user, attrs)
+    Chat.Repo.insert(changeset)
+  end
+
+  defp new_contacts_list(user) do
+    Core.create_contact_list(user)
   end
 
   @doc """

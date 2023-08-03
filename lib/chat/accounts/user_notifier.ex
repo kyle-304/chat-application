@@ -35,6 +35,7 @@ defmodule Chat.Accounts.UserNotifier do
 
     ==============================
     """)
+    |> IO.inspect()
   end
 
   @doc """

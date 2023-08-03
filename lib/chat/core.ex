@@ -8,6 +8,23 @@ defmodule Chat.Core do
   alias Chat.Core.ContactList
 
   @doc """
+  Creates a new contact list for a user
+  """
+  @spec create_contact_list(user :: User.t()) :: ContactList.t()
+  def create_contact_list(list \\ %ContactList{}, %{id: user_id}) do
+    changeset = ContactList.creation_changeset(list, %{user_id: user_id})
+    Chat.Repo.insert(changeset)
+  end
+
+  @doc """
+  Returns all the users within the system as possible contacts
+  """
+  @spec all_contacts() :: [Profile.t()] | []
+  def all_contacts do
+    Chat.Repo.all(Profile)
+  end
+
+  @doc """
   Returns a list of all the users in the user's contact list
   """
   @spec contacts_for_user(user :: User.t()) :: [Profile.t()] | []
@@ -41,6 +58,6 @@ defmodule Chat.Core do
 
   defp search_by_phone(phone_number) when is_binary(phone_number) do
     query = Profile.Query.phone_similar_to(phone_number)
-    Chat.Query.all(query)
+    Chat.Repo.all(query)
   end
 end

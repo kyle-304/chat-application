@@ -10,7 +10,7 @@ defmodule Chat.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
     has_one :profile, Chat.Accounts.Profile
-    many_to_many :chats, Chat.Accounts.Chat, join_through: Chat.Accounts.Chatuser
+    many_to_many :chats, Chat.Core.Chat, join_through: Chat.Core.Chatuser
 
     timestamps()
   end

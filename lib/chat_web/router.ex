@@ -71,6 +71,16 @@ defmodule ChatWeb.Router do
     end
   end
 
+  scope "/contacts", ChatWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :ensure_authenticated,
+      on_mount: [{ChatWeb.UserAuth, :ensure_authenticated}] do
+      live "/all", User.ContactsLive, :all_contacts
+      live "/", User.ContactsLive, :index
+    end
+  end
+
   scope "/", ChatWeb do
     pipe_through [:browser]
 
