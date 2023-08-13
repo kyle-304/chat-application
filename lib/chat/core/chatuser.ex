@@ -1,4 +1,4 @@
-defmodule Chat.Core.Chatuser do
+defmodule Chat.Core.ChatUser do
   @moduledoc """
   This module represent shte join table for the existing many to many relationship
   betweeen users and chats

@@ -50,7 +50,9 @@ defmodule Chat.Accounts.Profile do
   end
 
   defp validate_only_letters(changeset, field) when is_atom(field) do
-    validate_format(changeset, field, ~r/^[A-Za-z]+$/u, message: "name must only contain letters.")
+    validate_format(changeset, field, ~r/^[A-Za-z]+$/u,
+      message: "name must only contain letters."
+    )
   end
 
   defp remove_white_space(changeset, field) when is_atom(field) do

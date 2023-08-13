@@ -6,6 +6,7 @@ defmodule Chat.Core do
   alias Chat.Accounts.User
   alias Chat.Accounts.Profile
   alias Chat.Core.ContactList
+  alias Chat.Core.PrivateChat
 
   @doc """
   Creates a new contact list for a user
@@ -41,6 +42,31 @@ defmodule Chat.Core do
   defp fetch_contacts_from_contact_list(%{list: contact_user_ids}) do
     query = Profile.Query.from_user_ids(contact_user_ids)
     Chat.Repo.all(query)
+  end
+
+  @doc """
+  Returns a list of users with their profiles preloaded given a list
+  of user ids
+  """
+  @spec users_from_ids(user_ids :: list(String.t())) :: list(User.t()) | []
+  def users_from_ids(user_ids) when is_list(user_ids) do
+    query = user_from_ids_query(user_ids)
+    Chat.Repo.all(query)
+  end
+
+  defp user_from_ids_query(user_ids) do
+    user_ids
+    |> User.Query.from_user_ids()
+    |> User.Query.preload_profile()
+  end
+
+  @doc """
+  Returns true or false on whether a user with a given id exists
+  """
+  @spec user_exists?(user_id :: String.t()) :: true | false
+  def user_exists?(user_id) do
+    query = User.Query.from_user_id(user_id)
+    Chat.Repo.exists?(query)
   end
 
   @doc """
@@ -102,5 +128,60 @@ defmodule Chat.Core do
   defp remove_from_contact_list(contact_list, user_id) do
     changeset = ContactList.remove_contact_changeset(contact_list, %{contact_user_id: user_id})
     Chat.Repo.update(changeset)
+  end
+
+  @doc """
+  Returns a list of private messages for the user identified by the provided
+  user id
+  """
+  @spec private_chats_for_user(user :: User.t()) :: list(PrivateChat.t()) | []
+  def private_chats_for_user(%{id: user_id}) do
+    query = PrivateChat.Query.from_user_id(user_id)
+    Chat.Repo.all(query)
+  end
+
+  @doc """
+  Starts a private chat between the current user and the user who is the receiver
+  of the message
+
+  It first checks to ensure that there's a chat between the two user and if
+  it exists, it returns the chat. If not, it creates the chat between the two
+  users and returns it
+  """
+  @spec start_private_chat(current_user :: User.t(), receiver_id :: String.t()) ::
+          {:ok, PrivateChat.t()} | {:error, Ecto.Changeset.t()}
+  def start_private_chat(current_user, receiver_id) do
+    identifiers = private_chat_identifiers(current_user, receiver_id)
+
+    case private_chat_for_users(identifiers) do
+      nil -> new_private_chat(current_user, receiver_id)
+      private_chat -> fetch_messages(private_chat)
+    end
+  end
+
+  defp private_chat_identifiers(%{id: sender_id}, receiver_id) do
+    user_ids = [sender_id, receiver_id]
+    PrivateChat.private_chat_identifiers(user_ids)
+  end
+
+  defp private_chat_for_users(identifier) when is_map(identifier) do
+    query = PrivateChat.Query.from_identifiers(identifier)
+    Chat.Repo.one(query)
+  end
+
+  defp new_private_chat(%{id: sender_id}, receiver_id, chat \\ %PrivateChat{}) do
+    params = %{"user_ids" => [sender_id, receiver_id]}
+    changeset = PrivateChat.creation_changeset(chat, params, current_user: sender_id)
+
+    insert_private_chat_and_preload_messages(changeset)
+  end
+
+  defp insert_private_chat_and_preload_messages(changeset) do
+    {:ok, private_chat} = Chat.Repo.insert(changeset)
+    {:ok, fetch_messages(private_chat)}
+  end
+
+  defp fetch_messages(private_chat) do
+    Chat.Repo.preload(private_chat, [:private_messages])
   end
 end

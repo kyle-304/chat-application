@@ -27,6 +27,11 @@ defmodule ChatWeb.User.ContactsLive do
     {:noreply, handle_remove_from_contacts(socket, user_id)}
   end
 
+  @impl Phoenix.LiveView
+  def handle_event("start_chat", %{"user_id" => user_id}, socket) do
+    {:noreply, handle_start_chat(socket, user_id)}
+  end
+
   defp assign_contact_ids(%{assigns: %{current_user: user}} = socket) do
     contacts = Core.contacts_for_user(user)
     contact_ids = Enum.map(contacts, & &1.user_id)
@@ -86,6 +91,14 @@ defmodule ChatWeb.User.ContactsLive do
     socket
     |> assign(:contact_ids, List.delete(con_ids, user_id))
     |> assign(:contacts, Enum.reject(cons, &(&1.user_id == user_id)))
+  end
+
+  # Start chat
+  defp handle_start_chat(%{assigns: %{current_user: user}} = socket, receiver_id) do
+    case Core.start_private_chat(user, receiver_id) do
+      {:ok, _chat} -> push_navigate(socket, to: ~p"/chat/#{receiver_id}")
+      {:error, _changeset} -> put_flash(socket, :error, "could not start chat with user")
+    end
   end
 
   # Functions to be used within the html file
