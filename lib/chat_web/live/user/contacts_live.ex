@@ -14,7 +14,7 @@ defmodule ChatWeb.User.ContactsLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_params(params, _url, socket) do
+  def handle_params(_params, _url, socket) do
     {:noreply, prepare_socket(socket)}
   end
 
@@ -42,7 +42,7 @@ defmodule ChatWeb.User.ContactsLive do
     assign_user_contacts(socket, user)
   end
 
-  defp prepare_socket(%{assigns: %{current_user: user, live_action: :all_contacts}} = socket) do
+  defp prepare_socket(%{assigns: %{live_action: :all_contacts}} = socket) do
     assign_all_contacts(socket)
   end
 

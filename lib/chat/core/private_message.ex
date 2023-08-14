@@ -35,8 +35,8 @@ defmodule Chat.Core.PrivateMessage do
   @spec creation_changeset(message :: t() | Changeset.t(), attrs :: map()) :: Changeset.t()
   def creation_changeset(message, attrs) do
     message
-    |> cast(attrs, [:text, :sender_id, :receiver_id])
-    |> validate_required([:text, :sender_id, :receiver_id])
+    |> cast(attrs, [:text, :sender_id, :receiver_id, :private_chat_id])
+    |> validate_required([:text, :sender_id, :receiver_id, :private_chat_id])
     |> foreign_key_constraint(:private_chat_id)
   end
 end

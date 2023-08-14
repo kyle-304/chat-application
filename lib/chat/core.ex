@@ -7,6 +7,7 @@ defmodule Chat.Core do
   alias Chat.Accounts.Profile
   alias Chat.Core.ContactList
   alias Chat.Core.PrivateChat
+  alias Chat.Core.PrivateMessage
 
   @doc """
   Creates a new contact list for a user
@@ -141,22 +142,21 @@ defmodule Chat.Core do
   end
 
   @doc """
-  Starts a private chat between the current user and the user who is the receiver
-  of the message
-
-  It first checks to ensure that there's a chat between the two user and if
-  it exists, it returns the chat. If not, it creates the chat between the two
-  users and returns it
+  Returns a changeset for tracking changes for the private message
   """
-  @spec start_private_chat(current_user :: User.t(), receiver_id :: String.t()) ::
-          {:ok, PrivateChat.t()} | {:error, Ecto.Changeset.t()}
-  def start_private_chat(current_user, receiver_id) do
-    identifiers = private_chat_identifiers(current_user, receiver_id)
+  @spec change_private_message(message :: PrivateMessage.t(), attrs :: map()) :: Changeset.t()
+  def change_private_message(message, attrs \\ %{}) do
+    PrivateMessage.creation_changeset(message, attrs)
+  end
 
-    case private_chat_for_users(identifiers) do
-      nil -> new_private_chat(current_user, receiver_id)
-      private_chat -> fetch_messages(private_chat)
-    end
+  @doc """
+  Returns the private chat between two users if it exist and nil if it doesn't
+  """
+  @spec private_chat_for_users(user :: User.t(), receiver_id :: String.t()) ::
+          PrivateChat.t() | nil
+  def private_chat_for_users(current_user, receiver_id) do
+    identifiers = private_chat_identifiers(current_user, receiver_id)
+    private_chat_for_users(identifiers)
   end
 
   defp private_chat_identifiers(%{id: sender_id}, receiver_id) do
@@ -167,6 +167,23 @@ defmodule Chat.Core do
   defp private_chat_for_users(identifier) when is_map(identifier) do
     query = PrivateChat.Query.from_identifiers(identifier)
     Chat.Repo.one(query)
+  end
+
+  @doc """
+  Starts a private chat between the current user and the user who is the receiver
+  of the message
+
+  It first checks to ensure that there's a chat between the two user and if
+  it exists, it returns the chat. If not, it creates the chat between the two
+  users and returns it
+  """
+  @spec start_private_chat(current_user :: User.t(), receiver_id :: String.t()) ::
+          {:ok, PrivateChat.t()} | {:error, Ecto.Changeset.t()}
+  def start_private_chat(current_user, receiver_id) do
+    case private_chat_for_users(current_user, receiver_id) do
+      nil -> new_private_chat(current_user, receiver_id)
+      private_chat -> {:ok, private_chat}
+    end
   end
 
   defp new_private_chat(%{id: sender_id}, receiver_id, chat \\ %PrivateChat{}) do
@@ -183,5 +200,16 @@ defmodule Chat.Core do
 
   defp fetch_messages(private_chat) do
     Chat.Repo.preload(private_chat, [:private_messages])
+  end
+
+  @doc """
+  Creates a new message that will be sent as a private message between
+  two users
+  """
+  @spec create_private_message(attrs :: map(), message :: PrivateMessage.t()) ::
+          {:ok, PrivateMessage.t()} | {:error, Ecto.Changeset.t()}
+  def create_private_message(attrs, message \\ %PrivateMessage{}) do
+    changeset = PrivateMessage.creation_changeset(message, attrs)
+    Chat.Repo.insert(changeset)
   end
 end

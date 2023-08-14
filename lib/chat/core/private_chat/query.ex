@@ -29,6 +29,8 @@ defmodule Chat.Core.PrivateChat.Query do
   """
   @spec from_identifiers(query :: queryable(), identifiers :: map()) :: queryable()
   def from_identifiers(query \\ base(), %{identifier1: ident1, identifier2: ident2}) do
-    where(query, [p], ^ident1 in p.identifiers and ^ident2 in p.identifiers)
+    query
+    |> where([p], ^ident1 in p.identifiers and ^ident2 in p.identifiers)
+    |> preload([p], [:private_messages])
   end
 end
