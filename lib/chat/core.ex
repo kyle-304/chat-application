@@ -71,21 +71,26 @@ defmodule Chat.Core do
   end
 
   @doc """
-  Returns a list of users with the given email or phone number
+  Returns a list of private chats for a given user based on the search parameter
+  provided
   """
-  @spec search_contacts(search :: String.t()) :: [Profile.t()] | []
-  def search_contacts(search) do
-    if Regex.match?(~r/@/, search), do: search_by_email(search), else: search_by_phone(search)
+  @spec search_private_chats_by_name(user :: User.t(), name :: String.t()) ::
+          [PrivateChat.t()] | []
+  def search_private_chats_by_name(user, name) when is_binary(name) and name == "" do
+    private_chats_for_user(user)
   end
 
-  defp search_by_email(email) when is_binary(email) do
-    query = Profile.Query.email_similar_to(email)
-    Chat.Repo.all(query)
+  def search_private_chats_by_name(user, name) when is_binary(name) do
+    private_chats = private_chats_for_user(user)
+    find_private_chats_similar_to_name(private_chats, name, user)
   end
 
-  defp search_by_phone(phone_number) when is_binary(phone_number) do
-    query = Profile.Query.phone_similar_to(phone_number)
-    Chat.Repo.all(query)
+  defp find_private_chats_similar_to_name(private_chats, name, user) do
+    for %{participants: users} = chat <- private_chats, reduce: [] do
+      acc ->
+        %{"full_name" => f_name} = Enum.find(users, &(&1["id"] != user.id))
+        if String.jaro_distance(f_name, name) >= 0.5, do: [chat | acc], else: acc
+    end
   end
 
   @doc """

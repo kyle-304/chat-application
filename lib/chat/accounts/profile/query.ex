@@ -22,20 +22,11 @@ defmodule Chat.Accounts.Profile.Query do
   end
 
   @doc """
-   Returns a query for the profile where the profiles' email addresses are similar
-   to the one provided
+  Returns a query for the profile where the profiles' first or last names
+  are similarto the one provided
   """
-  @spec email_similar_to(query :: queryable(), email :: String.t()) :: queryable()
-  def email_similar_to(query \\ base(), email) do
-    where(query, [p], ilike(p.email, ^"#{email}%"))
-  end
-
-  @doc """
-   Returns a query for the profile where the profiles' phone numbers are similar
-   to the one provided
-  """
-  @spec phone_similar_to(query :: queryable(), phone_number :: String.t()) :: queryable()
-  def phone_similar_to(query \\ base(), phone_number) do
-    where(query, [p], ilike(p.phone_number, ^"#{phone_number}%"))
+  @spec names_similar_to(query :: queryable(), name :: String.t()) :: queryable()
+  def names_similar_to(query \\ base(), name) do
+    where(query, [p], ilike(p.first_name, ^"#{name}%") or ilike(p.last_name, ^"#{name}%"))
   end
 end

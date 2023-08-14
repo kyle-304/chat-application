@@ -1,11 +1,14 @@
 <div class="grid grid-cols-[300px,auto] h-[calc(100%-64px)]">
   <aside class="bg-gray-800 flex flex-col px-5 pt-5">
     <div class="mb-7 w-full flex">
-      <input
-        type="text"
-        class="py-2 px-2 rounded-lg flex-grow border-gray-200 bg-gray-300 focus:outline-none focus:border-gray-200"
-        placeholder="search"
-      />
+      <.form for={@search_form} phx-submit="search" class="bg-transparent w-full">
+        <.input
+          field={@search_form["name"]}
+          type="text"
+          class="py-2 px-2 rounded-lg flex-grow border-gray-200 bg-gray-300 focus:outline-none focus:border-gray-200"
+          placeholder="search"
+        />
+      </.form>
     </div>
 
     <div id="private-chats" phx-update="stream" class="flex flex-col space-y-5">

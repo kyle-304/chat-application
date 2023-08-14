@@ -21,7 +21,9 @@ defmodule Chat.Core.PrivateChat.Query do
   """
   @spec from_user_id(query :: queryable(), user_id :: String.t()) :: queryable()
   def from_user_id(query \\ base(), user_id) do
-    where(query, [p], ^user_id in p.user_ids)
+    query
+    |> where([p], ^user_id in p.user_ids)
+    |> preload([p], [:private_messages])
   end
 
   @doc """

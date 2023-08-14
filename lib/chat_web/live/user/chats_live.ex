@@ -14,15 +14,21 @@ defmodule ChatWeb.User.ChatsLive do
   @impl LiveView
   def mount(_params, _session, socket) do
     socket = configure_socket_streams(socket)
-    opts = [layout: {Layouts, :chat}, temporary_assigns: [form: nil]]
+    opts = [layout: {Layouts, :chat}, temporary_assigns: [form: nil, search_form: nil]]
 
     {:ok, assign_and_subscribe_to_private_chats(socket), opts}
   end
 
   defp configure_socket_streams(socket) do
     socket
+    |> add_search_form()
     |> stream_configure(:private_chats, dom_id: & &1.id)
     |> stream_configure(:private_messages, dom_id: & &1.id)
+  end
+
+  defp add_search_form(socket) do
+    form = to_form(%{"name" => ""}, as: "search")
+    assign(socket, search_form: form)
   end
 
   defp assign_and_subscribe_to_private_chats(%{assigns: %{current_user: user}} = socket) do
@@ -81,12 +87,25 @@ defmodule ChatWeb.User.ChatsLive do
 
     socket
     |> assign(:private_chat_id, private_chat.id)
-    |> stream(:private_messages, private_chat.private_messages, reset: true)
+    |> stream(:private_messages, private_chat.private_messages)
   end
 
   @impl LiveView
   def handle_event("send", %{"message" => params}, socket) do
     {:noreply, handle_send(socket, params)}
+  end
+
+  @impl LiveView
+  def handle_event("search", %{"search" => params}, socket) do
+    {:noreply, handle_search(socket, params)}
+  end
+
+  defp handle_search(%{assigns: %{current_user: user}} = socket, %{"name" => name}) do
+    private_chats = Core.search_private_chats_by_name(user, name)
+
+    socket
+    |> stream(:private_chats, [], reset: true)
+    |> stream(:private_chats, private_chats, reset: true)
   end
 
   defp handle_send(socket, params) do
