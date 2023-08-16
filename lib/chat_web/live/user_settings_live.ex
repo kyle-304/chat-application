@@ -24,14 +24,12 @@ defmodule ChatWeb.UserSettingsLive do
 
   defp handle_save_profile(%{assigns: %{profile: profile}} = socket, params) do
     case Core.update_profile(profile, params) do
+      {:ok, _profile} -> handle_success(socket)
       {:error, changeset} -> assign(socket, :changeset, changeset)
-      {:ok, profile} -> handle_success(socket, profile)
     end
   end
 
-  defp handle_success(socket, profile) do
-    changeset = Core.change_profile(profile)
-
+  defp handle_success(socket) do
     socket
     |> put_flash(:info, "profile updated successfully")
     |> push_navigate(to: ~p"/contacts")
