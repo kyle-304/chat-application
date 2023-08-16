@@ -164,4 +164,10 @@ defmodule ChatWeb.User.ChatsLive do
   defp message_color(%{sender_id: sender_id} = _msg, %{id: current_user_id}) do
     if sender_id == current_user_id, do: "bg-blue-500", else: "bg-green-500"
   end
+
+  ## sets the correct arrow direction based on whether the message's sender id
+  # is simialr to the currenly logged in user's id
+  defp arrow_direction(%{sender_id: sender_id} = _msg, %{id: current_user_id}) do
+    if sender_id == current_user_id, do: "rounded-br-none", else: "rounded-tl-none"
+  end
 end

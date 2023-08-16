@@ -54,7 +54,8 @@
         <div class="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
           <div>
             <span class={[
-              "px-4 py-2 rounded-lg inline-block text-xs rounded-tl-none text-white font-semibold",
+              "px-4 py-2 rounded-lg inline-block text-xs text-white font-semibold",
+              arrow_direction(message, @current_user),
               message_color(message, @current_user)
             ]}>
               <%= message.text %>

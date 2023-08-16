@@ -11,10 +11,10 @@
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body class="bg-white antialiased relative overflow-y-hidden">
+  <body class="bg-gray-100 antialiased relative overflow-y-hidden">
     <ul class="bg-[#111827] h-16 w-full z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end sticky top-0">
       <%= if @current_user do %>
-        <li class="text-[0.8125rem] leading-6 text-white">
+        <li class="text-[0.8125rem] leading-6 text-gray-300 font-semibold hover:text-zinc-700">
           <%= @current_user.email %>
         </li>
         <li class="mr-5">
@@ -23,6 +23,15 @@
             class="text-[0.8125rem] leading-6 text-white font-semibold hover:text-zinc-700"
           >
             Settings
+          </.link>
+        </li>
+
+                <li class="mr-5">
+          <.link
+            href={~p"/contacts"}
+            class="text-[0.8125rem] leading-6 text-white font-semibold hover:text-zinc-700"
+          >
+            Contacts
           </.link>
         </li>
 

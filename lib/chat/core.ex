@@ -217,4 +217,22 @@ defmodule Chat.Core do
     changeset = PrivateMessage.creation_changeset(message, attrs)
     Chat.Repo.insert(changeset)
   end
+
+  @doc """
+  Returns a changet for tracking changes in the profile
+  """
+  @spec change_profile(profile :: Profile.t(), attrs :: map()) :: Ecto.Changeset.t()
+  def change_profile(profile, attrs \\ %{}) do
+    Profile.creation_changeset(profile, attrs)
+  end
+
+  @doc """
+  Updates the profile provided with the provided changes
+  """
+  @spec update_profile(profile :: Profile.t(), attrs :: map()) ::
+          {:ok, Profile.t()} | {:error, Ecto.Changeset.t()}
+  def update_profile(profile, attrs) do
+    changeset = change_profile(profile, attrs)
+    Chat.Repo.update(changeset)
+  end
 end
